@@ -27,15 +27,18 @@ class Board:
     def add_ball(self, ball):
         self.engine.balls.append(ball)
 
-    def add_obstacle(self, obstacle):
-        self.engine.obstacles.append(obstacle)
+    def add_line(self, line):
+        self.engine.lines.append(line)
+
+    def add_peg(self, peg):
+        self.engine.pegs.append(peg)
 
     def add_balls(self):
         self.add_circles(self.ballNum, BALL_GAP, BALL_END, BALL_GAP, self.add_ball, self.ballRadius, ORANGE)
 
     def add_pegs(self):
         end = self.height - BIN_HEIGHT - 4 * BORDER
-        self.add_circles(2048, PEG_START, end, self.ballRadius * 4, self.add_obstacle, self.pegRadius, GRAY2)
+        self.add_circles(2048, PEG_START, end, self.ballRadius * 4, self.add_peg, self.pegRadius, GRAY2)
 
     def add_circles(self, n, start, end, margin, add2group, radius, color):
         row = 0
@@ -55,37 +58,38 @@ class Board:
     def add_bins(self):
         width = self.width / self.binNum
         for i in range(1, self.binNum):
-            self.add_obstacle(Line(i * width - BORDER / 2, self.height - BORDER - BIN_HEIGHT, i * width - BORDER / 2, self.height - BORDER, GRAY2))
-            self.add_obstacle(Line(i * width + BORDER / 2, self.height - BORDER - BIN_HEIGHT, i * width + BORDER / 2, self.height - BORDER, GRAY2))
-            self.add_obstacle(Circle(np.array([i * width, self.height - BORDER - BIN_HEIGHT]), BORDER // 2, GRAY2))
+            self.add_line(Line(i * width - BORDER / 2, self.height - BORDER - BIN_HEIGHT, i * width - BORDER / 2, self.height - BORDER, GRAY2))
+            self.add_line(Line(i * width + BORDER / 2, self.height - BORDER - BIN_HEIGHT, i * width + BORDER / 2, self.height - BORDER, GRAY2))
+            self.add_peg(Circle(np.array([i * width, self.height - BORDER - BIN_HEIGHT]), BORDER // 2, GRAY2))
 
     def add_funnel(self):
-        self.add_obstacle(Line(BORDER, FUNNEL_START - BORDER / 2, (self.width - self.ballRadius * 2.5 - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT - BORDER / 2, GRAY2))
-        self.add_obstacle(Line(BORDER, FUNNEL_START + BORDER / 2, (self.width - self.ballRadius * 2.5 - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT + BORDER / 2, GRAY2))
-        self.add_obstacle(Line(self.width - BORDER, FUNNEL_START - BORDER / 2, (self.width + self.ballRadius * 2.5 + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT - BORDER / 2, GRAY2))
-        self.add_obstacle(Line(self.width - BORDER, FUNNEL_START + BORDER / 2, (self.width + self.ballRadius * 2.5 + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT + BORDER / 2, GRAY2))
-        self.add_obstacle(Circle(np.array([(self.width - self.ballRadius * 2.5 - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT]), BORDER // 2, GRAY2))
-        self.add_obstacle(Circle(np.array([(self.width + self.ballRadius * 2.5 + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT]), BORDER // 2, GRAY2))
+        self.add_line(Line(BORDER, FUNNEL_START - BORDER / 2, (self.width - self.ballRadius * 2.5 - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT - BORDER / 2, GRAY2))
+        self.add_line(Line(BORDER, FUNNEL_START + BORDER / 2, (self.width - self.ballRadius * 2.5 - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT + BORDER / 2, GRAY2))
+        self.add_line(Line(self.width - BORDER, FUNNEL_START - BORDER / 2, (self.width + self.ballRadius * 2.5 + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT - BORDER / 2, GRAY2))
+        self.add_line(Line(self.width - BORDER, FUNNEL_START + BORDER / 2, (self.width + self.ballRadius * 2.5 + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT + BORDER / 2, GRAY2))
+        self.add_peg(Circle(np.array([(self.width - self.ballRadius * 2.5 - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT]), BORDER // 2, GRAY2))
+        self.add_peg(Circle(np.array([(self.width + self.ballRadius * 2.5 + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT]), BORDER // 2, GRAY2))
 
     def add_border(self):
-        self.add_obstacle(Line(BORDER, BORDER, self.width - BORDER, BORDER, GRAY2))
-        self.add_obstacle(Line(BORDER, BORDER, BORDER, self.height - BORDER, GRAY2))
-        self.add_obstacle(Line(BORDER, self.height - BORDER, self.width - BORDER, self.height - BORDER, GRAY2))
-        self.add_obstacle(Line(self.width - BORDER, BORDER, self.width - BORDER, self.height - BORDER, GRAY2))
+        self.add_line(Line(BORDER, BORDER, self.width - BORDER, BORDER, GRAY2))
+        self.add_line(Line(BORDER, BORDER, BORDER, self.height - BORDER, GRAY2))
+        self.add_line(Line(BORDER, self.height - BORDER, self.width - BORDER, self.height - BORDER, GRAY2))
+        self.add_line(Line(self.width - BORDER, BORDER, self.width - BORDER, self.height - BORDER, GRAY2))
 
     def print(self):
         pygame.draw.rect(self.screen, GRAY3, (self.x, self.y, self.width, self.height))
         for ball in self.engine.balls:
             ball.print(self.screen, self.x, self.y)
-        # self.fill()
-        for obstacle in self.engine.obstacles:
-            obstacle.print(self.screen, self.x, self.y)
+        self.fill()
+        for obstacles in [self.engine.lines, self.engine.pegs]:
+            for obstacle in obstacles:
+                obstacle.print(self.screen, self.x, self.y)
 
     def fill(self):
-        pygame.draw.line(self.screen, GRAY2, (self.x, self.y + BORDER / 2 - 1), (self.x + self.width, self.y + BORDER / 2 - 1), BORDER)
-        pygame.draw.line(self.screen, GRAY2, (self.x + BORDER / 2 - 1, self.y), (self.x + BORDER / 2 - 1, self.y + self.height), BORDER)
-        pygame.draw.line(self.screen, GRAY2, (self.x, self.y + self.height - BORDER / 2), (self.x + self.width, self.y + self.height - BORDER / 2), BORDER)
-        pygame.draw.line(self.screen, GRAY2, (self.x + self.width - BORDER / 2, self.y), (self.x + self.width - BORDER / 2, self.y + self.height), BORDER)
+        pygame.draw.line(self.screen, GRAY2, (self.x, self.y + BORDER / 2), (self.x + self.width - 1, self.y + BORDER / 2), BORDER)
+        pygame.draw.line(self.screen, GRAY2, (self.x + BORDER / 2, self.y), (self.x + BORDER / 2, self.y + self.height - 1), BORDER)
+        pygame.draw.line(self.screen, GRAY2, (self.x, self.y + self.height - BORDER / 2), (self.x + self.width - 1, self.y + self.height - BORDER / 2), BORDER)
+        pygame.draw.line(self.screen, GRAY2, (self.x + self.width - BORDER / 2, self.y), (self.x + self.width - BORDER / 2, self.y + self.height - 1), BORDER)
         pygame.draw.line(self.screen, GRAY2, (self.x + BORDER, self.y + FUNNEL_START), (self.x + (self.width - self.ballRadius * 2.5 - BORDER) / 2, self.y + FUNNEL_START + FUNNEL_HEIGHT), BORDER)
         pygame.draw.line(self.screen, GRAY2, (self.x + self.width - BORDER, self.y + FUNNEL_START), (self.x + (self.width + self.ballRadius * 2.5 + BORDER) / 2, self.y + FUNNEL_START + FUNNEL_HEIGHT), BORDER)
         width = self.width / self.binNum

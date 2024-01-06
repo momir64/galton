@@ -16,7 +16,7 @@ class Circle:
         self.applyGravity()
 
     def update(self, dt):
-        self.speed += self.force * dt / self.mass
+        self.speed += self.force * dt # / self.mass
         self.position += self.speed * dt * DISTANCE2PIXEL
         self.force = np.zeros(2)
         self.applyGravity()
@@ -25,7 +25,7 @@ class Circle:
         self.force += np.array([0, self.mass * self.gravity])
 
     def applyImpulse(self, impulse, dt):
-        self.speed += impulse / self.mass
+        self.speed += impulse # / self.mass
         self.position += self.speed * dt * DISTANCE2PIXEL
 
     def print(self, screen, x, y):

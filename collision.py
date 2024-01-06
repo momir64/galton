@@ -6,11 +6,11 @@ def projectSpeed(speed, vector):
 
 
 def circle_circle(circle1, circle2, collisions):
-    distance = circle1.position - circle2.position
+    distance = circle2.position - circle1.position
     distane_norm = np.linalg.norm(distance)
-    if distane_norm <= circle2.radius + circle1.radius:
-        point = (circle1.position + circle2.position) / 2
-        collisions.append(Collision(point, distance / distane_norm, circle1.speed - circle2.speed, circle1, circle2))
+    if distane_norm <= circle1.radius + circle2.radius:
+        penetration = circle1.radius + circle2.radius - distane_norm
+        collisions.append(Collision(penetration, distance / distane_norm, circle1.speed - circle2.speed, circle1, circle2))
 
 
 def circle_line(ball, line, collisions):
@@ -21,13 +21,13 @@ def circle_line(ball, line, collisions):
         distance = closest_point - ball.position
         distane_norm = np.linalg.norm(distance)
         if distane_norm <= ball.radius:
-            collisions.append(Collision(closest_point, distance / distane_norm, ball.speed, ball, line))
+            collisions.append(Collision(ball.radius - distane_norm, distance / distane_norm, ball.speed, ball, line))
 
 
 class Collision:
-    def __init__(self, point, normal, relativeSpeed, ball, obstacle):
+    def __init__(self, penetration, normal, relativeSpeed, ball, obstacle):
         self.relativeSpeed = relativeSpeed
         self.normal = normal
-        self.point = point
+        self.penetration = penetration
         self.ball = ball
         self.obstacle = obstacle

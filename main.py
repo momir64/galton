@@ -53,8 +53,8 @@ textRect5.center = (225, 470)
 textRect6.center = (225, 570)
 
 ballNumberSlider = Slider(screen, 60, 100, 330, 12, min=1, max=450, initial=17, colour=GRAY3, handleColour=GRAY4)
-ballRadiusSlider = Slider(screen, 60, 200, 330, 12, min=3, max=19, initial=7, colour=GRAY3, handleColour=GRAY4)
-pegRadiusSlider = Slider(screen, 60, 300, 330, 12, min=3, max=19, initial=5, colour=GRAY3, handleColour=GRAY4)
+ballRadiusSlider = Slider(screen, 60, 200, 330, 12, min=4, max=19, initial=7, colour=GRAY3, handleColour=GRAY4)
+pegRadiusSlider = Slider(screen, 60, 300, 330, 12, min=4, max=19, initial=5, colour=GRAY3, handleColour=GRAY4)
 binNumberSlider = Slider(screen, 60, 400, 330, 12, min=3, max=16, initial=10, colour=GRAY3, handleColour=GRAY4)
 gravitySlider = Slider(screen, 60, 500, 330, 12, min=0.1, max=50, initial=9.81, step=0.01, colour=GRAY3, handleColour=GRAY4)
 restitutionSlider = Slider(screen, 60, 600, 330, 12, min=0, max=1, initial=0.5, step=0.01, colour=GRAY3, handleColour=GRAY4)
@@ -101,7 +101,7 @@ while True:
         board.update_restitution(RESTITUTION)
 
     if update:
-        board.update(0.01)
+        board.update(dt)
     board.print()
 
     pygame.display.update()
