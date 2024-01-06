@@ -1,10 +1,6 @@
 import numpy as np
 
 
-def projectSpeed(speed, vector):
-    return vector * np.dot(speed, vector) / np.dot(vector, vector)
-
-
 def circle_circle(circle1, circle2, collisions):
     distance = circle2.position - circle1.position
     distane_norm = np.linalg.norm(distance)
