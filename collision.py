@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def ball_peg(ball, peg, collisions):
+def circle_circle(ball, peg, collisions):
     distance = peg.position - ball.position
     distane_norm = np.linalg.norm(distance)
     penetration = ball.radius + peg.radius - distane_norm
@@ -9,7 +9,7 @@ def ball_peg(ball, peg, collisions):
         collisions.append(Collision(penetration, distance / distane_norm, ball.speed, ball, peg))
 
 
-def ball_line(ball, line, collisions):
+def circle_line(ball, line, collisions):
     closest_point = line.start + (np.dot(ball.position - line.start, line.vector) / line.length2) * line.vector
     if np.isclose(np.linalg.norm(closest_point - line.start) + np.linalg.norm(closest_point - line.end), line.length, atol=0.1):
         distance = closest_point - ball.position

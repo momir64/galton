@@ -15,8 +15,9 @@ class Board:
         self.pegRadius = pegRadius
         self.binNum = binNum
         self.restitution, self.gravity = restitution, np.array([0, gravity])
+        self.gridSize = max(ballRadius * 2, pegRadius * 2)
 
-        self.engine = Engine()
+        self.engine = Engine(height // self.gridSize + 1, width // self.gridSize + 1, self.gridSize)
 
         self.add_bins()
         self.add_pegs()
@@ -26,12 +27,21 @@ class Board:
 
     def add_ball(self, ball):
         self.engine.balls.append(ball)
+        # self.engine.grid[ball.position[1] // self.gridSize][ball.position[0] // self.gridSize].append(ball)
 
     def add_line(self, line):
         self.engine.lines.append(line)
+        start = (line.start // self.gridSize).astype("int")
+        end = (line.end // self.gridSize).astype("int")
+        r_start, r_end = max(0, min((start[1], end[1]))), min(max(start[1], end[1]) + 1, self.engine.rows)
+        c_start, c_end = max(0, min((start[0], end[0]))), min(max(start[0], end[0]) + 1, self.engine.cols)
+        for row in range(r_start, r_end):
+            for col in range(c_start, c_end):
+                self.engine.grid[row][col].append(line)
 
     def add_peg(self, peg):
         self.engine.pegs.append(peg)
+        self.engine.grid[int(peg.position[1] // self.gridSize)][int(peg.position[0] // self.gridSize)].append(peg)
 
     def add_balls(self):
         self.add_circles(self.ballNum, BALL_GAP, BALL_END, BALL_GAP, self.add_ball, self.ballRadius, ORANGE, self.restitution)
