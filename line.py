@@ -13,5 +13,5 @@ class Line:
         self.color = color
 
     def print(self, screen, x, y):
-        pygame.draw.line(screen, self.color, (x + self.start[0], y + self.start[1]), (x + self.end[0], y + self.end[1]))
-        # pygame.draw.aaline(screen, self.color, (x + self.start[0], y + self.start[1]), (x + self.end[0], y + self.end[1]))
+        # pygame.draw.line(screen, self.color, (x + self.start[0], y + self.start[1]), (x + self.end[0], y + self.end[1]))
+        pygame.draw.aaline(screen, self.color, (x + self.start[0], y + self.start[1]), (x + self.end[0], y + self.end[1]))
