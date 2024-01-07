@@ -15,6 +15,9 @@ class Engine:
         self.pegs = []
 
     def update(self, dt):
+        for ball in self.balls:
+            ball.update(dt)
+
         self.find_collisions()
         for collisions in [self.peg_collisions, self.line_collisions, self.ball_collisions]:
             for c in collisions:
@@ -23,9 +26,6 @@ class Engine:
                 impulse = -correction - np.dot(c.relativeSpeed, c.normal) * c.normal * (1 + c.ball.restitution * c.obstacle.restitution)  # * c.ball.mass
                 self.balls[i].applyImpulse(impulse, dt)
             collisions.clear()
-        
-        for ball in self.balls:
-            ball.update(dt)
 
     def find_collisions(self):
         for ball in self.balls:
