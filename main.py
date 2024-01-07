@@ -13,7 +13,6 @@ BOARD_WIDTH = 510
 BOARD_HEIGHT = 720
 BALL_NUMBER = 17  # 134
 BALL_RADIUS = 7  # 6
-BALL_MASS = 1
 PEG_RADIUS = 5
 BIN_NUMBER = 10
 RESTITUTION = 0.5
@@ -29,7 +28,7 @@ def start():
     RESTITUTION = restitutionSlider.getValue()
     GRAVITY = gravitySlider.getValue()
     update = True
-    board = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, BALL_MASS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY)
+    board = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY)
 
 
 pygame.init()
@@ -52,16 +51,16 @@ textRect4.center = (225, 370)
 textRect5.center = (225, 470)
 textRect6.center = (225, 570)
 
-ballNumberSlider = Slider(screen, 60, 100, 330, 12, min=1, max=450, initial=17, colour=GRAY3, handleColour=GRAY4)
-ballRadiusSlider = Slider(screen, 60, 200, 330, 12, min=4, max=19, initial=7, colour=GRAY3, handleColour=GRAY4)
-pegRadiusSlider = Slider(screen, 60, 300, 330, 12, min=4, max=19, initial=5, colour=GRAY3, handleColour=GRAY4)
-binNumberSlider = Slider(screen, 60, 400, 330, 12, min=3, max=16, initial=10, colour=GRAY3, handleColour=GRAY4)
+ballNumberSlider = Slider(screen, 60, 100, 330, 12, min=1, max=450, initial=14, colour=GRAY3, handleColour=GRAY4)
+ballRadiusSlider = Slider(screen, 60, 200, 330, 12, min=4, max=19, initial=13, colour=GRAY3, handleColour=GRAY4)
+pegRadiusSlider = Slider(screen, 60, 300, 330, 12, min=4, max=19, initial=4, colour=GRAY3, handleColour=GRAY4)
+binNumberSlider = Slider(screen, 60, 400, 330, 12, min=3, max=16, initial=8, colour=GRAY3, handleColour=GRAY4)
 gravitySlider = Slider(screen, 60, 500, 330, 12, min=0.1, max=50, initial=9.81, step=0.01, colour=GRAY3, handleColour=GRAY4)
 restitutionSlider = Slider(screen, 60, 600, 330, 12, min=0, max=1, initial=0.5, step=0.01, colour=GRAY3, handleColour=GRAY4)
 
 update = False
 t0 = pygame.time.get_ticks()
-board = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, BALL_MASS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY)
+board = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY)
 button = Button(screen, 60, 690, 330, 70, text="Pokreni", inactiveColour=GRAY2, hoverColour=GRAY3, pressedColour=GRAY3, textColour=WHITE, font=font1, onClick=start)
 
 while True:
@@ -91,7 +90,7 @@ while True:
         binNumberSlider.setValue(min(binNumberSlider.max, BIN_NUMBER))
         ballNumberSlider.max = min(450, (BOARD_WIDTH - 2 * BORDER) // (BALL_RADIUS * 2 + BALL_GAP) * (BALL_END) // (BALL_RADIUS * 2 + BALL_GAP) + (10 if BALL_RADIUS == 3 else 0))
         ballNumberSlider.setValue(min(ballNumberSlider.max, BALL_NUMBER))
-        board = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, BALL_MASS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY)
+        board = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY)
         update = False
 
     if RESTITUTION != restitutionSlider.getValue() or GRAVITY != gravitySlider.getValue():
@@ -101,7 +100,7 @@ while True:
         board.update_restitution(RESTITUTION)
 
     if update:
-        board.update(dt)
+        board.update(0.01)
     board.print()
 
     pygame.display.update()

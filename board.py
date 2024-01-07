@@ -7,14 +7,14 @@ import pygame
 
 
 class Board:
-    def __init__(self, screen, x, y, width, height, ballNum, ballRadius, ballMass, pegRadius, binNum, restitution, gravity):
+    def __init__(self, screen, x, y, width, height, ballNum, ballRadius, pegRadius, binNum, restitution, gravity):
         self.screen = screen
         self.x, self.y = x, y
         self.width, self.height = width, height
-        self.ballNum, self.ballRadius, self.ballMass = ballNum, ballRadius, ballMass
+        self.ballNum, self.ballRadius = ballNum, ballRadius
         self.pegRadius = pegRadius
         self.binNum = binNum
-        self.restitution, self.gravity = restitution, gravity
+        self.restitution, self.gravity = restitution, np.array([0, gravity])
 
         self.engine = Engine()
 
@@ -34,13 +34,13 @@ class Board:
         self.engine.pegs.append(peg)
 
     def add_balls(self):
-        self.add_circles(self.ballNum, BALL_GAP, BALL_END, BALL_GAP, self.add_ball, self.ballRadius, ORANGE)
+        self.add_circles(self.ballNum, BALL_GAP, BALL_END, BALL_GAP, self.add_ball, self.ballRadius, ORANGE, self.restitution)
 
     def add_pegs(self):
         end = self.height - BIN_HEIGHT - 4 * BORDER
-        self.add_circles(2048, PEG_START, end, self.ballRadius * 4, self.add_peg, self.pegRadius, GRAY2)
+        self.add_circles(2048, PEG_START, end, self.ballRadius * 4, self.add_peg, self.pegRadius, GRAY2, PEG_RESTITUTION)
 
-    def add_circles(self, n, start, end, margin, add2group, radius, color):
+    def add_circles(self, n, start, end, margin, add2group, radius, color, restitution):
         row = 0
         while n > 0:
             rowMax = (self.width - 2 * BORDER) // (margin + 2 * radius) - row % 2
@@ -51,7 +51,7 @@ class Board:
                 y = BORDER + start + radius + row * (margin / 2 + 2 * radius)
                 if y + radius > end:
                     continue
-                add2group(Circle(np.array([x, y], float), radius, color, self.ballMass, self.restitution, self.gravity))
+                add2group(Circle(np.array([x, y], float), radius, color, restitution, self.gravity))
             n -= rowMax
             row += 1
 
@@ -97,12 +97,14 @@ class Board:
             pygame.draw.line(self.screen, GRAY2, (self.x + i * width, self.y + self.height - BORDER - BIN_HEIGHT), (self.x + i * width, self.y + self.height - BORDER), BORDER)
 
     def update_restitution(self, restitution):
+        self.restitution = restitution
         for ball in self.engine.balls:
             ball.restitution = restitution
 
     def update_gravity(self, gravity):
+        self.gravity = np.array([0, gravity])
         for ball in self.engine.balls:
-            ball.gravity = gravity
+            ball.gravity = self.gravity
 
     def update(self, dt):
         self.engine.update(dt)
