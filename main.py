@@ -86,7 +86,7 @@ while True:
         BALL_NUMBER = ballNumberSlider.getValue()
         PEG_RADIUS = pegRadiusSlider.getValue()
         BIN_NUMBER = binNumberSlider.getValue()
-        binNumberSlider.max = min(16, (BOARD_WIDTH - 2 * BORDER) // (BALL_RADIUS * 3))
+        binNumberSlider.max = min(16, (BOARD_WIDTH - 4 * BORDER) // (BALL_RADIUS * 4))
         binNumberSlider.setValue(min(binNumberSlider.max, BIN_NUMBER))
         ballNumberSlider.max = min(450, (BOARD_WIDTH - 2 * BORDER) // (BALL_RADIUS * 2 + BALL_GAP) * (BALL_END) // (BALL_RADIUS * 2 + BALL_GAP) + (10 if BALL_RADIUS == 3 else 0))
         ballNumberSlider.setValue(min(ballNumberSlider.max, BALL_NUMBER))

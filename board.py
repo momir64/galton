@@ -56,11 +56,11 @@ class Board:
             row += 1
 
     def add_bins(self):
-        width = self.width / self.binNum
+        width = (self.width - BORDER * 2) / self.binNum
         for i in range(1, self.binNum):
-            self.add_line(Line(i * width - BORDER / 2, self.height - BORDER - BIN_HEIGHT, i * width - BORDER / 2, self.height - BORDER, GRAY2))
             self.add_line(Line(i * width + BORDER / 2, self.height - BORDER - BIN_HEIGHT, i * width + BORDER / 2, self.height - BORDER, GRAY2))
-            self.add_peg(Circle(np.array([i * width, self.height - BORDER - BIN_HEIGHT]), BORDER // 2, GRAY2))
+            self.add_line(Line(i * width + 3 * BORDER / 2, self.height - BORDER - BIN_HEIGHT, i * width + 3 * BORDER / 2, self.height - BORDER, GRAY2))
+            self.add_peg(Circle(np.array([BORDER + i * width, self.height - BORDER - BIN_HEIGHT]), BORDER // 2, GRAY2))
 
     def add_funnel(self):
         self.add_line(Line(BORDER, FUNNEL_START - BORDER / 2, (self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT - BORDER / 2, GRAY2))
@@ -92,9 +92,9 @@ class Board:
         pygame.draw.line(self.screen, GRAY2, (self.x + self.width - BORDER / 2, self.y), (self.x + self.width - BORDER / 2, self.y + self.height - 1), BORDER)
         pygame.draw.line(self.screen, GRAY2, (self.x + BORDER, self.y + FUNNEL_START), (self.x + (self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, self.y + FUNNEL_START + FUNNEL_HEIGHT), BORDER)
         pygame.draw.line(self.screen, GRAY2, (self.x + self.width - BORDER, self.y + FUNNEL_START), (self.x + (self.width + self.ballRadius * FUNNEL_GAP + BORDER) / 2, self.y + FUNNEL_START + FUNNEL_HEIGHT), BORDER)
-        width = self.width / self.binNum
+        width = (self.width - BORDER * 2) / self.binNum
         for i in range(1, self.binNum):
-            pygame.draw.line(self.screen, GRAY2, (self.x + i * width, self.y + self.height - BORDER - BIN_HEIGHT), (self.x + i * width, self.y + self.height - BORDER), BORDER)
+            pygame.draw.line(self.screen, GRAY2, (BORDER + self.x + i * width, self.y + self.height - BORDER - BIN_HEIGHT), (BORDER + self.x + i * width, self.y + self.height - BORDER), BORDER)
 
     def update_restitution(self, restitution):
         self.restitution = restitution
