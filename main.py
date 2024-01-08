@@ -36,15 +36,12 @@ gravitySlider = Slider(screen, 60, 500, 330, 12, min=0.1, max=50, initial=GRAVIT
 restitutionSlider = Slider(screen, 60, 600, 330, 12, min=0, max=1, initial=RESTITUTION, step=0.01, colour=GRAY3, handleColour=GRAY4)
 button = Button(screen, 60, 690, 330, 70, text="Pokreni", inactiveColour=GRAY2, hoverColour=GRAY3, pressedColour=GRAY3, textColour=WHITE, font=font1, onClick=start)
 board, update = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY), False
-t0 = pygame.time.get_ticks()
 
 while True:
     screen.fill(GRAY1)
     for title in titles:
         screen.blit(*title)
     events = pygame.event.get()
-    t = pygame.time.get_ticks()
-    t0, dt = t, (t - t0) / 1000.0
     pygame_widgets.update(events)
 
     for event in events:
@@ -67,7 +64,7 @@ while True:
         board.update_gravity(GRAVITY)
 
     if update:
-        board.update(0.01)
+        board.update(DT)
     board.print()
 
     pygame.display.update()

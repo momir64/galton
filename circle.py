@@ -7,26 +7,17 @@ import pygame
 class Circle:
     def __init__(self, position, radius, color, restitution=0, gravity=np.zeros(2)):
         self.restitution, self.gravity = restitution, gravity
-        self.color = color
         self.position = position
-        self.radius = radius
-
         self.speed = np.zeros(2)
-        # self.force = np.zeros(2)
-        # self.applyGravity()
+        self.radius = radius
+        self.color = color
 
     def update(self, dt):
-        self.speed += self.gravity * dt  # / self.mass
+        self.speed += self.gravity * dt
         self.position += self.speed * dt * DISTANCE2PIXEL
 
-    #     self.force = np.zeros(2)
-    #     self.applyGravity()
-
-    # def applyGravity(self):
-    #     self.force += np.array([0, self.mass * self.gravity])
-
     def applyImpulse(self, impulse, dt):
-        self.speed += impulse  # / self.mass
+        self.speed += impulse
         self.position += self.speed * dt * DISTANCE2PIXEL
 
     def print(self, screen, x, y):
