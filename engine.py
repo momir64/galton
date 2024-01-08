@@ -12,8 +12,8 @@ class Engine:
         self.cols = width // gridSize + 1
         self.grid = [[[] for _ in range(self.cols)] for _ in range(self.rows)]
         self.gridSize = gridSize
-        self.collisions = []
         self.ball_collisions = []
+        self.collisions = []
         self.lines = []
         self.balls = []
         self.pegs = []
