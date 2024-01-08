@@ -14,7 +14,7 @@ def circle_line(ball, line, collisions):
     if np.isclose(np.linalg.norm(closest_point - line.start) + np.linalg.norm(closest_point - line.end), line.length, atol=0.1):
         distance = closest_point - ball.position
         distane_norm = np.linalg.norm(distance)
-        penetration = ball.radius - distane_norm
+        penetration = ball.radius + line.radius - distane_norm
         if penetration >= 0:
             collisions.append(Collision(penetration, distance / distane_norm, ball.speed, ball, line))
 

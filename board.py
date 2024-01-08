@@ -6,8 +6,9 @@ import numpy as np
 import pygame
 
 
-class Board:
+class Board(Engine):
     def __init__(self, screen, x, y, width, height, ballNum, ballRadius, pegRadius, binNum, restitution, gravity):
+        super().__init__(width, height, 20)
         self.screen = screen
         self.x, self.y = x, y
         self.width, self.height = width, height
@@ -15,9 +16,6 @@ class Board:
         self.pegRadius = pegRadius
         self.binNum = binNum
         self.restitution, self.gravity = restitution, np.array([0, gravity])
-        self.gridSize = max(ballRadius * 2, pegRadius * 2)
-
-        self.engine = Engine(height // self.gridSize + 1, width // self.gridSize + 1, self.gridSize)
 
         self.add_bins()
         self.add_pegs()
@@ -25,35 +23,17 @@ class Board:
         self.add_border()
         self.add_funnel()
 
-    def add_ball(self, ball):
-        self.engine.balls.append(ball)
-        # self.engine.grid[ball.position[1] // self.gridSize][ball.position[0] // self.gridSize].append(ball)
-
-    def add_line(self, line):
-        self.engine.lines.append(line)
-        start = (line.start // self.gridSize).astype("int")
-        end = (line.end // self.gridSize).astype("int")
-        r_start, r_end = max(0, min((start[1], end[1]))), min(max(start[1], end[1]) + 1, self.engine.rows)
-        c_start, c_end = max(0, min((start[0], end[0]))), min(max(start[0], end[0]) + 1, self.engine.cols)
-        for row in range(r_start, r_end):
-            for col in range(c_start, c_end):
-                self.engine.grid[row][col].append(line)
-
-    def add_peg(self, peg):
-        self.engine.pegs.append(peg)
-        self.engine.grid[int(peg.position[1] // self.gridSize)][int(peg.position[0] // self.gridSize)].append(peg)
-
     def add_balls(self):
         self.add_circles(self.ballNum, BALL_GAP, BALL_END, BALL_GAP, self.add_ball, self.ballRadius, ORANGE, self.restitution)
 
     def add_pegs(self):
         end = self.height - BIN_HEIGHT - 4 * BORDER
-        self.add_circles(2048, PEG_START, end, self.ballRadius * 4, self.add_peg, self.pegRadius, GRAY2, PEG_RESTITUTION)
+        self.add_circles(2048, PEG_START, end, self.ballRadius * PEG_GAP, self.add_peg, self.pegRadius, GRAY2, PEG_RESTITUTION)
 
     def add_circles(self, n, start, end, margin, add2group, radius, color, restitution):
         row = 0
         while n > 0:
-            rowMax = (self.width - 2 * BORDER) // (margin + 2 * radius) - row % 2
+            rowMax = int((self.width - 2 * BORDER) // (margin + 2 * radius) - row % 2)
             cols = min(n, rowMax)
             for i in range(cols):
                 center = (self.width - cols * (margin + 2 * radius) + margin) / 2
@@ -68,56 +48,39 @@ class Board:
     def add_bins(self):
         width = (self.width - BORDER * 2) / self.binNum
         for i in range(1, self.binNum):
-            self.add_line(Line(i * width + BORDER / 2, self.height - BORDER - BIN_HEIGHT, i * width + BORDER / 2, self.height - BORDER, GRAY2))
-            self.add_line(Line(i * width + 3 * BORDER / 2, self.height - BORDER - BIN_HEIGHT, i * width + 3 * BORDER / 2, self.height - BORDER, GRAY2))
+            self.add_line(Line(i * width + BORDER, self.height - BORDER - BIN_HEIGHT, i * width + BORDER, self.height - BORDER, BORDER, GRAY2))
             self.add_peg(Circle(np.array([BORDER + i * width, self.height - BORDER - BIN_HEIGHT]), BORDER // 2, GRAY2))
 
     def add_funnel(self):
-        self.add_line(Line(BORDER, FUNNEL_START - BORDER / 2, (self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT - BORDER / 2, GRAY2))
-        self.add_line(Line(BORDER, FUNNEL_START + BORDER / 2, (self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT + BORDER / 2, GRAY2))
-        self.add_line(Line(self.width - BORDER, FUNNEL_START - BORDER / 2, (self.width + self.ballRadius * FUNNEL_GAP + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT - BORDER / 2, GRAY2))
-        self.add_line(Line(self.width - BORDER, FUNNEL_START + BORDER / 2, (self.width + self.ballRadius * FUNNEL_GAP + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT + BORDER / 2, GRAY2))
+        self.add_line(Line(BORDER / 2, FUNNEL_START, (self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT, BORDER, GRAY2))
+        self.add_line(Line(self.width - BORDER / 2, FUNNEL_START, (self.width + self.ballRadius * FUNNEL_GAP + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT, BORDER, GRAY2))
         self.add_peg(Circle(np.array([(self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT]), BORDER // 2, GRAY2))
         self.add_peg(Circle(np.array([(self.width + self.ballRadius * FUNNEL_GAP + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT]), BORDER // 2, GRAY2))
 
     def add_border(self):
-        self.add_line(Line(BORDER, BORDER, self.width - BORDER, BORDER, GRAY2))
-        self.add_line(Line(BORDER, BORDER, BORDER, self.height - BORDER, GRAY2))
-        self.add_line(Line(BORDER, self.height - BORDER, self.width - BORDER, self.height - BORDER, GRAY2))
-        self.add_line(Line(self.width - BORDER, BORDER, self.width - BORDER, self.height - BORDER, GRAY2))
+        self.add_line(Line(0, BORDER / 2, self.width - 1, BORDER / 2, BORDER, GRAY2))
+        self.add_line(Line(BORDER / 2, 0, BORDER / 2, self.height - 1, BORDER, GRAY2))
+        self.add_line(Line(0, self.height - BORDER / 2, self.width - 1, self.height - BORDER / 2, BORDER, GRAY2))
+        self.add_line(Line(self.width - BORDER / 2, 0, self.width - BORDER / 2, self.height - 1, BORDER, GRAY2))
 
     def print(self):
         pygame.draw.rect(self.screen, GRAY3, (self.x, self.y, self.width, self.height))
-        for ball in self.engine.balls:
-            ball.print(self.screen, self.x, self.y)
-        self.fill()
-        for obstacles in [self.engine.lines, self.engine.pegs]:
-            for obstacle in obstacles:
-                obstacle.print(self.screen, self.x, self.y)
-
-    def fill(self):
-        pygame.draw.line(self.screen, GRAY2, (self.x, self.y + BORDER / 2), (self.x + self.width - 1, self.y + BORDER / 2), BORDER)
-        pygame.draw.line(self.screen, GRAY2, (self.x + BORDER / 2, self.y), (self.x + BORDER / 2, self.y + self.height - 1), BORDER)
-        pygame.draw.line(self.screen, GRAY2, (self.x, self.y + self.height - BORDER / 2), (self.x + self.width - 1, self.y + self.height - BORDER / 2), BORDER)
-        pygame.draw.line(self.screen, GRAY2, (self.x + self.width - BORDER / 2, self.y), (self.x + self.width - BORDER / 2, self.y + self.height - 1), BORDER)
-        pygame.draw.line(self.screen, GRAY2, (self.x + BORDER, self.y + FUNNEL_START), (self.x + (self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, self.y + FUNNEL_START + FUNNEL_HEIGHT), BORDER)
-        pygame.draw.line(self.screen, GRAY2, (self.x + self.width - BORDER, self.y + FUNNEL_START), (self.x + (self.width + self.ballRadius * FUNNEL_GAP + BORDER) / 2, self.y + FUNNEL_START + FUNNEL_HEIGHT), BORDER)
-        width = (self.width - BORDER * 2) / self.binNum
-        for i in range(1, self.binNum):
-            pygame.draw.line(self.screen, GRAY2, (BORDER + self.x + i * width, self.y + self.height - BORDER - BIN_HEIGHT), (BORDER + self.x + i * width, self.y + self.height - BORDER), BORDER)
+        for objects in [self.balls, self.lines, self.pegs]:
+            for object in objects:
+                object.print(self.screen, self.x, self.y)
 
     def update_restitution(self, restitution):
         self.restitution = restitution
-        for ball in self.engine.balls:
+        for ball in self.balls:
             ball.restitution = restitution
 
     def update_gravity(self, gravity):
         self.gravity = np.array([0, gravity])
-        for ball in self.engine.balls:
+        for ball in self.balls:
             ball.gravity = self.gravity
 
     def update(self, dt):
-        self.engine.update(dt)
-        for ball in self.engine.balls:
+        super().update(dt)
+        for ball in self.balls:
             if ball.position[1] > self.height:
-                self.engine.balls.remove(ball)
+                self.balls.remove(ball)

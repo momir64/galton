@@ -6,25 +6,43 @@ import numpy as np
 
 
 class Engine:
-    def __init__(self, rows, cols, gridSize):
-        self.grid = [[[]] * cols for _ in range(rows)]
+    def __init__(self, width, height, gridSize):
+        self.rows = height // gridSize + 1
+        self.cols = width // gridSize + 1
+        self.grid = [[[] for _ in range(self.cols)] for _ in range(self.rows)]
         self.gridSize = gridSize
         self.collisions = []
-        self.rows = rows
-        self.cols = cols
         self.lines = []
         self.balls = []
         self.pegs = []
+
+    def add_ball(self, ball):
+        self.balls.append(ball)
+        # self.grid[ball.position[1] // self.gridSize][ball.position[0] // self.gridSize].append(ball)
+
+    def add_line(self, line):
+        self.lines.append(line)
+        start = (line.start // self.gridSize).astype("int")
+        end = (line.end // self.gridSize).astype("int")
+        r_start, r_end = max(0, min((start[1], end[1]))), min(max(start[1], end[1]) + 1, self.rows)
+        c_start, c_end = max(0, min((start[0], end[0]))), min(max(start[0], end[0]) + 1, self.cols)
+        for row in range(r_start, r_end):
+            for col in range(c_start, c_end):
+                self.grid[row][col].append(line)
+
+    def add_peg(self, peg):
+        self.pegs.append(peg)
+        self.grid[int(peg.position[1] // self.gridSize)][int(peg.position[0] // self.gridSize)].append(peg)
 
     def update(self, dt):
         for ball in self.balls:
             ball.update(dt)
 
         self.find_collisions()
-        for c in self.collisions:
-            i = self.balls.index(c.ball)
-            correction = (c.penetration * 0.3) * c.normal
-            impulse = -correction - np.dot(c.relativeSpeed, c.normal) * c.normal * (1 + c.ball.restitution * c.obstacle.restitution)  # * c.ball.mass
+        for collision in self.collisions:
+            i = self.balls.index(collision.ball)
+            correction = (collision.penetration * 0.2) * collision.normal
+            impulse = -correction - np.dot(collision.relativeSpeed, collision.normal) * collision.normal * (1 + collision.ball.restitution * collision.obstacle.restitution)
             self.balls[i].applyImpulse(impulse, dt)
         self.collisions.clear()
 
@@ -41,8 +59,8 @@ class Engine:
             for obstacle in obstacles:
                 if isinstance(obstacle, Circle):
                     circle_circle(ball, obstacle, self.collisions)
-                if isinstance(obstacle, Line):
+                elif isinstance(obstacle, Line):
                     circle_line(ball, obstacle, self.collisions)
-            for ball2 in self.balls:
-                if ball != ball2:
-                    circle_circle(ball, ball2, self.collisions)
+            # for ball2 in self.balls:
+            #     if ball != ball2:
+            #         circle_circle(ball, ball2, self.collisions)
