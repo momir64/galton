@@ -1,19 +1,21 @@
 from collision import circle_circle, circle_line
 from circle import Circle
 from constants import *
+import multiprocessing
 from line import Line
 import numpy as np
 import itertools
 
 
 class Engine:
-    def __init__(self, width, height, gridSize):
+    def __init__(self, width, height, gridSize, pool):
         self.rows = height // gridSize + 1
         self.cols = width // gridSize + 1
         self.grid = [[[] for _ in range(self.cols)] for _ in range(self.rows)]
         self.gridSize = gridSize
         self.ball_collisions = []
         self.collisions = []
+        self.pool = pool
         self.lines = []
         self.balls = []
         self.pegs = []
@@ -48,7 +50,7 @@ class Engine:
             self.balls[i].applyImpulse(impulse, dt)
         self.collisions.clear()
 
-        self.find_ball_collisions()
+        self.find_ball_collisions_parallel()
         for collision in self.ball_collisions:
             ball1 = self.balls.index(collision.obj1)
             ball2 = self.balls.index(collision.obj2)
@@ -70,10 +72,31 @@ class Engine:
                         obstacles.add(obstacle)
             for obstacle in obstacles:
                 if isinstance(obstacle, Circle):
-                    circle_circle(ball, obstacle, self.collisions)
+                    collision = circle_circle(ball, obstacle)
                 elif isinstance(obstacle, Line):
-                    circle_line(ball, obstacle, self.collisions)
+                    collision = circle_line(ball, obstacle)
+                if collision:
+                    self.collisions.append(collision)
 
-    def find_ball_collisions(self):
-        for balls in list(itertools.combinations(self.balls, 2)):
-            circle_circle(balls[0], balls[1], self.ball_collisions)
+    # def find_ball_collisions(self):
+    #     for balls in list(itertools.combinations(self.balls, 2)):
+    #         collision = circle_circle(balls[0], balls[1])
+    #         if collision:
+    #             self.ball_collisions.append(collision)
+
+    def find_ball_collisions_parallel(self):
+        pairs = list(itertools.combinations(self.balls, 2))
+        chunk_size = len(pairs) // multiprocessing.cpu_count()
+        chunks = [pairs[i : i + chunk_size] for i in range(0, len(pairs), chunk_size)]
+        results = self.pool.map(find_ball_collisions_part, chunks)
+        for result in results:
+            self.ball_collisions.extend(result)
+
+
+def find_ball_collisions_part(pairs):
+    collisions = []
+    for pair in pairs:
+        collision = circle_circle(pair[0], pair[1])
+        if collision:
+            collisions.append(collision)
+    return collisions

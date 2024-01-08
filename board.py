@@ -7,8 +7,8 @@ import pygame
 
 
 class Board(Engine):
-    def __init__(self, screen, x, y, width, height, ballNum, ballRadius, pegRadius, binNum, restitution, gravity):
-        super().__init__(width, height, 20)
+    def __init__(self, screen, x, y, width, height, ballNum, ballRadius, pegRadius, binNum, restitution, gravity, pool):
+        super().__init__(width, height, 20, pool)
         self.screen = screen
         self.x, self.y = x, y
         self.width, self.height = width, height
@@ -27,7 +27,7 @@ class Board(Engine):
         self.add_circles(self.ballNum, BALL_GAP, BALL_END, BALL_GAP, self.add_ball, self.ballRadius, ORANGE, self.restitution)
 
     def add_pegs(self):
-        end = self.height - BIN_HEIGHT - 4 * BORDER
+        end = self.height - BIN_HEIGHT - 3 * BORDER
         self.add_circles(2048, PEG_START, end, self.ballRadius * PEG_GAP, self.add_peg, self.pegRadius, GRAY2, PEG_RESTITUTION)
 
     def add_circles(self, n, start, end, margin, add2group, radius, color, restitution):
