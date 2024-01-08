@@ -13,6 +13,7 @@ def start():
     BALL_RADIUS, BALL_NUMBER, PEG_RADIUS, BIN_NUMBER = ballRadiusSlider.getValue(), ballNumberSlider.getValue(), pegRadiusSlider.getValue(), binNumberSlider.getValue()
     RESTITUTION, GRAVITY = restitutionSlider.getValue(), gravitySlider.getValue()
     board, update = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY), True
+    print(f"{BALL_RADIUS}, {BALL_NUMBER}, {PEG_RADIUS}, {BIN_NUMBER}, {RESTITUTION}, {GRAVITY}")
 
 
 pygame.init()
