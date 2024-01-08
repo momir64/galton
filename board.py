@@ -82,5 +82,5 @@ class Board(Engine):
     def update(self, dt):
         super().update(dt)
         for ball in self.balls:
-            if ball.position[1] > self.height:
+            if (not 0 < ball.position[0] < self.width) or (not 0 < ball.position[1] < self.height):
                 self.balls.remove(ball)
