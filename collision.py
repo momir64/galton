@@ -1,12 +1,12 @@
 import numpy as np
 
 
-def circle_circle(ball, peg, collisions):
-    distance = peg.position - ball.position
+def circle_circle(ball1, ball2, collisions):
+    distance = ball2.position - ball1.position
     distane_norm = np.linalg.norm(distance)
-    penetration = ball.radius + peg.radius - distane_norm
+    penetration = ball1.radius + ball2.radius - distane_norm
     if penetration >= 0:
-        collisions.append(Collision(penetration, distance / distane_norm, ball.speed, ball, peg))
+        collisions.append(Collision(penetration, distance / distane_norm, ball1.speed - ball2.speed, ball1, ball2))
 
 
 def circle_line(ball, line, collisions):
@@ -20,9 +20,9 @@ def circle_line(ball, line, collisions):
 
 
 class Collision:
-    def __init__(self, penetration, normal, relativeSpeed, ball, obstacle):
+    def __init__(self, penetration, normal, relativeSpeed, obj1, obj2):
         self.relativeSpeed = relativeSpeed
         self.normal = normal
         self.penetration = penetration
-        self.ball = ball
-        self.obstacle = obstacle
+        self.obj1 = obj1
+        self.obj2 = obj2

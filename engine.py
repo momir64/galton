@@ -3,6 +3,7 @@ from collision import Collision
 from circle import Circle
 from line import Line
 import numpy as np
+import itertools
 
 
 class Engine:
@@ -12,6 +13,7 @@ class Engine:
         self.grid = [[[] for _ in range(self.cols)] for _ in range(self.rows)]
         self.gridSize = gridSize
         self.collisions = []
+        self.ball_collisions = []
         self.lines = []
         self.balls = []
         self.pegs = []
@@ -40,11 +42,21 @@ class Engine:
 
         self.find_collisions()
         for collision in self.collisions:
-            i = self.balls.index(collision.ball)
+            i = self.balls.index(collision.obj1)
             correction = (collision.penetration * 0.2) * collision.normal
-            impulse = -correction - np.dot(collision.relativeSpeed, collision.normal) * collision.normal * (1 + collision.ball.restitution * collision.obstacle.restitution)
+            impulse = -correction - np.dot(collision.relativeSpeed, collision.normal) * collision.normal * (1 + collision.obj1.restitution * collision.obj2.restitution)
             self.balls[i].applyImpulse(impulse, dt)
         self.collisions.clear()
+
+        self.find_ball_collisions()
+        for collision in self.ball_collisions:
+            i = self.balls.index(collision.obj1)
+            # j = self.balls.index(collision.obj2)
+            correction = (collision.penetration * 0.2) * collision.normal
+            impulse = -correction - np.dot(collision.relativeSpeed, collision.normal) * collision.normal * collision.obj1.restitution
+            self.balls[i].applyImpulse(impulse, dt)
+            # self.balls[j].applyImpulse(-impulse, dt)
+        self.ball_collisions.clear()
 
     def find_collisions(self):
         for ball in self.balls:
@@ -63,4 +75,12 @@ class Engine:
                     circle_line(ball, obstacle, self.collisions)
             # for ball2 in self.balls:
             #     if ball != ball2:
-            #         circle_circle(ball, ball2, self.collisions)
+            #         circle_circle(ball, ball2, self.ball_collisions)
+
+    def find_ball_collisions(self):
+        for ball in self.balls:
+            for ball2 in self.balls:
+                if ball != ball2:
+                    circle_circle(ball, ball2, self.ball_collisions)
+    #     for balls in list(itertools.combinations(self.balls, 2)):
+    #         circle_circle(balls[0], balls[1], self.ball_collisions)
