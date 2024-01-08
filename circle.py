@@ -1,21 +1,20 @@
+from pygame import gfxdraw
 from constants import *
 import numpy as np
-from pygame import gfxdraw
+import itertools
 import pygame
-
-CIRCLE_ID = 0
 
 
 class Circle:
+    id_counter = itertools.count()
+
     def __init__(self, position, radius, color, restitution=0, gravity=np.zeros(2)):
-        global CIRCLE_ID
         self.restitution, self.gravity = restitution, gravity
+        self.id = next(Circle.id_counter)
         self.position = position
         self.speed = np.zeros(2)
         self.radius = radius
         self.color = color
-        self.id = CIRCLE_ID
-        CIRCLE_ID += 1
 
     def update(self, dt):
         self.speed += self.gravity * dt
@@ -35,5 +34,5 @@ class Circle:
     def __hash__(self):
         return self.id
 
-    def __eq__(self, __value: object) -> bool:
+    def __eq__(self, __value: object):
         return self.id == __value.id
