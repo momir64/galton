@@ -1,3 +1,6 @@
+from os import environ
+
+environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 from pygame_widgets.button import Button
 from pygame_widgets.slider import Slider
 from multiprocessing import Pool
@@ -17,7 +20,7 @@ if __name__ == "__main__":
         BALL_RADIUS, BALL_NUMBER, PEG_RADIUS, BIN_NUMBER = ballRadiusSlider.getValue(), ballNumberSlider.getValue(), pegRadiusSlider.getValue(), binNumberSlider.getValue()
         RESTITUTION, GRAVITY = restitutionSlider.getValue(), gravitySlider.getValue()
         board, update = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY, POOL), True
-        print(f"{BALL_RADIUS}, {BALL_NUMBER}, {PEG_RADIUS}, {BIN_NUMBER}, {RESTITUTION}, {GRAVITY}")
+        # print(f"{BALL_RADIUS}, {BALL_NUMBER}, {PEG_RADIUS}, {BIN_NUMBER}, {RESTITUTION:.2}, {float(GRAVITY):.4}")
 
     pygame.init()
     pygame.display.set_caption("Galtonova daska")
@@ -36,7 +39,7 @@ if __name__ == "__main__":
     pegRadiusSlider = Slider(screen, 60, 300, 330, 12, min=4, max=19, initial=PEG_RADIUS, colour=GRAY3, handleColour=GRAY4)
     binNumberSlider = Slider(screen, 60, 400, 330, 12, min=3, max=BIN_NUMBER_MAX, initial=BIN_NUMBER, colour=GRAY3, handleColour=GRAY4)
     gravitySlider = Slider(screen, 60, 500, 330, 12, min=0.1, max=50, initial=GRAVITY, step=0.01, colour=GRAY3, handleColour=GRAY4)
-    restitutionSlider = Slider(screen, 60, 600, 330, 12, min=0, max=1, initial=RESTITUTION, step=0.01, colour=GRAY3, handleColour=GRAY4)
+    restitutionSlider = Slider(screen, 60, 600, 330, 12, min=0.15, max=0.6, initial=RESTITUTION, step=0.01, colour=GRAY3, handleColour=GRAY4)
     button = Button(screen, 60, 690, 330, 70, text="Pokreni", inactiveColour=GRAY2, hoverColour=GRAY3, pressedColour=GRAY3, textColour=WHITE, font=font1, onClick=start)
     board, update = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY, POOL), False
     t0, dt = pygame.time.get_ticks(), 0
