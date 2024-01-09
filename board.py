@@ -52,10 +52,10 @@ class Board(Engine):
             self.add_peg(Circle(np.array([BORDER + i * width, self.height - BORDER - BIN_HEIGHT]), BORDER // 2, GRAY2))
 
     def add_funnel(self):
-        self.add_line(Line(BORDER / 2, FUNNEL_START, (self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT, BORDER, GRAY2))
-        self.add_line(Line(self.width - BORDER / 2, FUNNEL_START, (self.width + self.ballRadius * FUNNEL_GAP + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT, BORDER, GRAY2))
-        self.add_peg(Circle(np.array([(self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT]), BORDER // 2, GRAY2))
-        self.add_peg(Circle(np.array([(self.width + self.ballRadius * FUNNEL_GAP + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT]), BORDER // 2, GRAY2))
+        self.add_line(Line(BORDER / 2, FUNNEL_START, (self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT, FUNNEL_WIDTH, GRAY2))
+        self.add_line(Line(self.width - BORDER / 2, FUNNEL_START, (self.width + self.ballRadius * FUNNEL_GAP + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT, FUNNEL_WIDTH, GRAY2))
+        self.add_peg(Circle(np.array([(self.width - self.ballRadius * FUNNEL_GAP - BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT]), FUNNEL_WIDTH // 2, GRAY2))
+        self.add_peg(Circle(np.array([(self.width + self.ballRadius * FUNNEL_GAP + BORDER) / 2, FUNNEL_START + FUNNEL_HEIGHT]), FUNNEL_WIDTH // 2, GRAY2))
 
     def add_border(self):
         self.add_line(Line(0, BORDER / 2, self.width - 1, BORDER / 2, BORDER, GRAY2))

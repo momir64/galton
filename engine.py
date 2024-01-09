@@ -11,6 +11,7 @@ class Engine:
     def __init__(self, width, height, gridSize, pool):
         self.rows = height // gridSize + 1
         self.cols = width // gridSize + 1
+        self.ball_grid = [[[] for _ in range(self.cols)] for _ in range(self.rows)]
         self.grid = [[[] for _ in range(self.cols)] for _ in range(self.rows)]
         self.gridSize = gridSize
         self.ball_collisions = []
@@ -22,7 +23,6 @@ class Engine:
 
     def add_ball(self, ball):
         self.balls.append(ball)
-        # self.grid[ball.position[1] // self.gridSize][ball.position[0] // self.gridSize].append(ball)
 
     def add_line(self, line):
         self.lines.append(line)
@@ -48,9 +48,8 @@ class Engine:
             correction = (collision.penetration * CORRECTION_OBSTACLES) * collision.normal
             impulse = -correction - np.dot(collision.relativeSpeed, collision.normal) * collision.normal * (1 + collision.obj1.restitution * collision.obj2.restitution)
             self.balls[i].applyImpulse(impulse, dt)
-        self.collisions.clear()
 
-        pairs = list(itertools.combinations(self.balls, 2))
+        pairs = self.find_pairs()
         if len(pairs) <= multiprocessing.cpu_count():
             self.find_ball_collisions(pairs)
         else:
@@ -62,11 +61,30 @@ class Engine:
             impulse = -correction - np.dot(collision.relativeSpeed, collision.normal) * collision.normal * collision.obj1.restitution
             self.balls[ball1].applyImpulse(impulse, dt)
             self.balls[ball2].applyImpulse(-impulse, dt)
-        self.ball_collisions.clear()
+
+    def find_pairs(self):
+        pairs = set()
+        for ball1 in self.balls:
+            position = (ball1.position // self.gridSize).astype("int")
+            r_start, c_start = max(0, position[1] - 1), max(0, position[0] - 1)
+            r_end, c_end = min(self.rows, position[1] + 2), min(self.cols, position[0] + 2)
+            balls = set()
+            for row in range(r_start, r_end):
+                for col in range(c_start, c_end):
+                    for ball2 in self.ball_grid[row][col]:
+                        if ball1 != ball2:
+                            balls.add(ball2)
+            for ball2 in balls:
+                if (ball2, ball1) not in pairs:
+                    pairs.add((ball1, ball2))
+        return pairs
 
     def find_collisions(self):
+        self.collisions.clear()
+        self.ball_grid = [[[] for _ in range(self.cols)] for _ in range(self.rows)]
         for ball in self.balls:
             position = (ball.position // self.gridSize).astype("int")
+            self.ball_grid[position[1]][position[0]].append(ball)
             r_start, c_start = max(0, position[1] - 1), max(0, position[0] - 1)
             r_end, c_end = min(self.rows, position[1] + 2), min(self.cols, position[0] + 2)
             obstacles = set()
@@ -83,20 +101,22 @@ class Engine:
                     self.collisions.append(collision)
 
     def find_ball_collisions(self, pairs):
+        self.ball_collisions.clear()
         for balls in pairs:
             collision = circle_circle(balls[0], balls[1])
             if collision:
                 self.ball_collisions.append(collision)
 
     def find_ball_collisions_parallel(self, pairs):
-        chunk_size = len(pairs) // multiprocessing.cpu_count()
-        chunks = [pairs[i : i + chunk_size] for i in range(0, len(pairs), chunk_size)]
-        results = self.pool.map(find_ball_collisions_part, chunks)
-        for result in results:
-            self.ball_collisions.extend(result)
+        chunk_parts = multiprocessing.cpu_count()
+        chunks = [[] for _ in range(chunk_parts)]
+        for i, pair in enumerate(pairs):
+            chunks[i % chunk_parts].append(pair)
+        results = self.pool.map(find_ball_collisions_chunk, chunks)
+        self.ball_collisions = list(itertools.chain.from_iterable(results))
 
 
-def find_ball_collisions_part(pairs):
+def find_ball_collisions_chunk(pairs):
     collisions = []
     for pair in pairs:
         collision = circle_circle(pair[0], pair[1])
