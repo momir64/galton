@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     ballNumberSlider = Slider(screen, 60, 100, 330, 12, min=1, max=BALL_NUMBER_MAX, initial=BALL_NUMBER, colour=GRAY3, handleColour=GRAY4)
     ballRadiusSlider = Slider(screen, 60, 200, 330, 12, min=5, max=15, initial=BALL_RADIUS, colour=GRAY3, handleColour=GRAY4)
-    pegRadiusSlider = Slider(screen, 60, 300, 330, 12, min=4, max=19, initial=PEG_RADIUS, colour=GRAY3, handleColour=GRAY4)
+    pegRadiusSlider = Slider(screen, 60, 300, 330, 12, min=4, max=21, initial=PEG_RADIUS, colour=GRAY3, handleColour=GRAY4)
     binNumberSlider = Slider(screen, 60, 400, 330, 12, min=3, max=BIN_NUMBER_MAX, initial=BIN_NUMBER, colour=GRAY3, handleColour=GRAY4)
     gravitySlider = Slider(screen, 60, 500, 330, 12, min=0.1, max=50, initial=GRAVITY, step=0.01, colour=GRAY3, handleColour=GRAY4)
     restitutionSlider = Slider(screen, 60, 600, 330, 12, min=0.15, max=0.6, initial=RESTITUTION, step=0.01, colour=GRAY3, handleColour=GRAY4)
@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
         if BALL_NUMBER != ballNumberSlider.getValue() or BALL_RADIUS != ballRadiusSlider.getValue() or PEG_RADIUS != pegRadiusSlider.getValue() or BIN_NUMBER != binNumberSlider.getValue():
             BALL_RADIUS, BALL_NUMBER, PEG_RADIUS, BIN_NUMBER = ballRadiusSlider.getValue(), ballNumberSlider.getValue(), pegRadiusSlider.getValue(), binNumberSlider.getValue()
-            BALL_NUMBER_MAX = (BOARD_WIDTH - 2 * BORDER) // (BALL_RADIUS * 2 + BALL_GAP) * (BALL_END) // (BALL_RADIUS * 2 + BALL_GAP) + (10 if BALL_RADIUS == 3 else 0) - 1
+            BALL_NUMBER_MAX = (BOARD_WIDTH - 2 * BORDER) // (BALL_RADIUS * 2 + BALL_GAP) * (BALL_END) // (BALL_RADIUS * 2 + BALL_GAP)
             BIN_NUMBER_MAX = (BOARD_WIDTH - 4 * BORDER) // (BALL_RADIUS * 4)
             ballNumberSlider.max, binNumberSlider.max = min(450, BALL_NUMBER_MAX), min(16, BIN_NUMBER_MAX)
             ballNumberSlider.setValue(min(ballNumberSlider.max, BALL_NUMBER))
