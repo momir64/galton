@@ -50,7 +50,11 @@ class Engine:
             self.balls[i].applyImpulse(impulse, dt)
         self.collisions.clear()
 
-        self.find_ball_collisions_parallel()
+        pairs = list(itertools.combinations(self.balls, 2))
+        if len(pairs) <= multiprocessing.cpu_count():
+            self.find_ball_collisions(pairs)
+        else:
+            self.find_ball_collisions_parallel(pairs)
         for collision in self.ball_collisions:
             ball1 = self.balls.index(collision.obj1)
             ball2 = self.balls.index(collision.obj2)
@@ -78,14 +82,13 @@ class Engine:
                 if collision:
                     self.collisions.append(collision)
 
-    # def find_ball_collisions(self):
-    #     for balls in list(itertools.combinations(self.balls, 2)):
-    #         collision = circle_circle(balls[0], balls[1])
-    #         if collision:
-    #             self.ball_collisions.append(collision)
+    def find_ball_collisions(self, pairs):
+        for balls in pairs:
+            collision = circle_circle(balls[0], balls[1])
+            if collision:
+                self.ball_collisions.append(collision)
 
-    def find_ball_collisions_parallel(self):
-        pairs = list(itertools.combinations(self.balls, 2))
+    def find_ball_collisions_parallel(self, pairs):
         chunk_size = len(pairs) // multiprocessing.cpu_count()
         chunks = [pairs[i : i + chunk_size] for i in range(0, len(pairs), chunk_size)]
         results = self.pool.map(find_ball_collisions_part, chunks)
