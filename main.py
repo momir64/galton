@@ -65,15 +65,16 @@ if __name__ == "__main__":
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos, margin = np.array(pygame.mouse.get_pos(), float) - np.array([BOARD_X, BOARD_Y]), max(BORDER, BALL_RADIUS)
+                is_inside = margin < pos[0] < BOARD_WIDTH - margin and margin < pos[1] < BOARD_HEIGHT - margin
 
-        if pygame.mouse.get_pressed()[0] == True and dt2 >= COOLDOWN:
-            x, y = pygame.mouse.get_pos()
-            x, y = x - BOARD_X, y - BOARD_Y
-            if max(BORDER, BALL_RADIUS) < x < BOARD_WIDTH - max(BORDER, BALL_RADIUS) and max(BORDER, BALL_RADIUS) < y < BOARD_HEIGHT - max(BORDER, BALL_RADIUS):
-                ball, dt2 = Circle(np.array([x, y], float), BALL_RADIUS, ORANGE, RESTITUTION, GRAVITY), 0
+        if pygame.mouse.get_pressed()[0] == True and dt2 >= COOLDOWN and is_inside:
+            pos, margin = np.array(pygame.mouse.get_pos(), float) - np.array([BOARD_X, BOARD_Y]), max(BORDER, BALL_RADIUS)
+            if margin < pos[0] < BOARD_WIDTH - margin and margin < pos[1] < BOARD_HEIGHT - margin:
+                ball, dt2 = Circle(pos, BALL_RADIUS, ORANGE, RESTITUTION, GRAVITY), 0
                 board.add_ball(ball)
-                if not update:
-                    balls.append(ball)
+                balls.append(ball)
 
         if BALL_NUMBER != ballNumberSlider.getValue() or BALL_RADIUS != ballRadiusSlider.getValue() or PEG_RADIUS != pegRadiusSlider.getValue() or BIN_NUMBER != binNumberSlider.getValue():
             BALL_RADIUS, BALL_NUMBER, PEG_RADIUS, BIN_NUMBER = ballRadiusSlider.getValue(), ballNumberSlider.getValue(), pegRadiusSlider.getValue(), binNumberSlider.getValue()
@@ -93,6 +94,6 @@ if __name__ == "__main__":
         if update and dt >= DT:
             board.update(DT)
             dt = 0
-        board.print()
 
+        board.print()
         pygame.display.update()
