@@ -6,7 +6,12 @@ def circle_circle(ball1, ball2):
     distane_norm = np.linalg.norm(distance)
     penetration = ball1.radius + ball2.radius - distane_norm
     if penetration >= 0:
-        return Collision(penetration, distance / distane_norm, ball1.speed - ball2.speed, ball1, ball2)
+        if distane_norm:
+            normal = distance / distane_norm
+        else:
+            normal = np.random.rand(2)
+            normal = normal / np.linalg.norm(normal)
+        return Collision(penetration, normal, ball1.speed - ball2.speed, ball1, ball2)
     return None
 
 

@@ -4,11 +4,13 @@ environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 from pygame_widgets.button import Button
 from pygame_widgets.slider import Slider
 from multiprocessing import Pool
+from circle import Circle
 from board import Board
 from constants import *
 import multiprocessing
 import pygame.freetype
 import pygame_widgets
+import numpy as np
 import pygame
 import sys
 
@@ -19,7 +21,12 @@ if __name__ == "__main__":
         global board, update
         BALL_RADIUS, BALL_NUMBER, PEG_RADIUS, BIN_NUMBER = ballRadiusSlider.getValue(), ballNumberSlider.getValue(), pegRadiusSlider.getValue(), binNumberSlider.getValue()
         RESTITUTION, GRAVITY = restitutionSlider.getValue(), gravitySlider.getValue()
-        board, update = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY, POOL), True
+        board = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY, POOL)
+        if update:
+            balls.clear()
+        for ball in balls:
+            board.add_ball(ball)
+        update = True
         # print(f"{BALL_RADIUS}, {BALL_NUMBER}, {PEG_RADIUS}, {BIN_NUMBER}, {RESTITUTION:.2}, {float(GRAVITY):.4}")
 
     pygame.init()
@@ -41,8 +48,8 @@ if __name__ == "__main__":
     gravitySlider = Slider(screen, 60, 500, 330, 12, min=0.1, max=50, initial=GRAVITY, step=0.01, colour=GRAY3, handleColour=GRAY4)
     restitutionSlider = Slider(screen, 60, 600, 330, 12, min=0.15, max=0.6, initial=RESTITUTION, step=0.01, colour=GRAY3, handleColour=GRAY4)
     button = Button(screen, 60, 690, 330, 70, text="Pokreni", inactiveColour=GRAY2, hoverColour=GRAY3, pressedColour=GRAY3, textColour=WHITE, font=font1, onClick=start)
-    board, update = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY, POOL), False
-    t0, dt = pygame.time.get_ticks(), 0
+    board, update, balls = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY, POOL), False, []
+    t0, dt, dt2 = pygame.time.get_ticks(), 0, 0
 
     while True:
         screen.fill(GRAY1)
@@ -51,12 +58,22 @@ if __name__ == "__main__":
         events = pygame.event.get()
         pygame_widgets.update(events)
         t = pygame.time.get_ticks()
-        t0, dt = t, dt + (t - t0) / 1000
+        dt0 = (t - t0) / 1000.0
+        t0, dt, dt2 = t, dt + dt0, dt2 + dt0
 
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+        if pygame.mouse.get_pressed()[0] == True and dt2 >= COOLDOWN:
+            x, y = pygame.mouse.get_pos()
+            x, y = x - BOARD_X, y - BOARD_Y
+            if max(BORDER, BALL_RADIUS) < x < BOARD_WIDTH - max(BORDER, BALL_RADIUS) and max(BORDER, BALL_RADIUS) < y < BOARD_HEIGHT - max(BORDER, BALL_RADIUS):
+                ball, dt2 = Circle(np.array([x, y], float), BALL_RADIUS, ORANGE, RESTITUTION, GRAVITY), 0
+                board.add_ball(ball)
+                if not update:
+                    balls.append(ball)
 
         if BALL_NUMBER != ballNumberSlider.getValue() or BALL_RADIUS != ballRadiusSlider.getValue() or PEG_RADIUS != pegRadiusSlider.getValue() or BIN_NUMBER != binNumberSlider.getValue():
             BALL_RADIUS, BALL_NUMBER, PEG_RADIUS, BIN_NUMBER = ballRadiusSlider.getValue(), ballNumberSlider.getValue(), pegRadiusSlider.getValue(), binNumberSlider.getValue()
@@ -66,6 +83,7 @@ if __name__ == "__main__":
             ballNumberSlider.setValue(min(ballNumberSlider.max, BALL_NUMBER))
             binNumberSlider.setValue(min(binNumberSlider.max, BIN_NUMBER))
             board, update = Board(screen, BOARD_X, BOARD_Y, BOARD_WIDTH, BOARD_HEIGHT, BALL_NUMBER, BALL_RADIUS, PEG_RADIUS, BIN_NUMBER, RESTITUTION, GRAVITY, POOL), False
+            balls.clear()
 
         if RESTITUTION != restitutionSlider.getValue() or GRAVITY != gravitySlider.getValue():
             RESTITUTION, GRAVITY = restitutionSlider.getValue(), gravitySlider.getValue()
