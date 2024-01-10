@@ -8,8 +8,8 @@ import pygame
 class Circle:
     id_counter = itertools.count()
 
-    def __init__(self, position, radius, color, restitution=0, gravity=np.zeros(2)):
-        self.restitution, self.gravity = restitution, gravity
+    def __init__(self, position, radius, color, restitution=0, gravity=0):
+        self.restitution, self.gravity = restitution, np.array([0, gravity])
         self.id = next(Circle.id_counter)
         self.position = position
         self.speed = np.zeros(2)

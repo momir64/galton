@@ -15,7 +15,7 @@ class Board(Engine):
         self.ballNum, self.ballRadius = ballNum, ballRadius
         self.pegRadius = pegRadius
         self.binNum = binNum
-        self.restitution, self.gravity = restitution, np.array([0, gravity])
+        self.restitution, self.gravity = restitution, gravity
 
         self.add_bins()
         self.add_pegs()
