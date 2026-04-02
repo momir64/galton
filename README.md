@@ -1,6 +1,6 @@
-# Simulacija galtonove daske
+# Simulacija Galtonove daske
 
-Dvodimenzionalna simulacija galtonove daske.  
+Dvodimenzionalna simulacija Galtonove daske.  
 Projekat iz predmeta numerički algoritmi i numerički softver.  
 
 ## Pokretanje
